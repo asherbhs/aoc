@@ -20,6 +20,7 @@ case $language in
 		gcc -o aoc aoc.c && ./aoc $year $day $part $path
 		cd ..
 	;;
+	# c++
 	# clojure
 	haskell)
 		cd haskell
