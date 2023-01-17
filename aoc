@@ -1,0 +1,42 @@
+language=$1
+year=$2
+day=$3
+part=$4
+example=$5
+
+if [[ $example == example ]]
+then path=$(realpath inputs/$year/example$day.txt)
+else path=$(realpath inputs/$year/input$day.txt)
+fi
+
+case $language in
+	bqn)
+		cd bqn
+		CBQN/BQN aoc.bqn $year $day $part $path
+		cd ..
+	;;
+	c)
+		cd c
+		gcc -o aoc aoc.c && ./aoc $year $day $part $path
+		cd ..
+	;;
+	# clojure
+	haskell)
+		cd haskell
+		stack build --silent && stack run -- $year $day $part $path
+		cd ..
+	;;
+	# kotlin
+	java)
+		cd java
+		javac AOC.java && java AOC $year $day $part $path
+		cd ..
+	;;
+	# odin
+	python)
+		cd python
+		python3 aoc.py $year $day $part $path
+		cd ..
+	;;
+	# rust
+esac
