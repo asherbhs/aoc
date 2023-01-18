@@ -11,31 +11,35 @@ fi
 
 case $language in
 	bqn)
-		cd bqn
+		cd bqn-aoc
 		CBQN/BQN aoc.bqn $year $day $part $path
 		cd ..
 	;;
 	c)
-		cd c
+		cd c-aoc
 		gcc -o aoc aoc.c && ./aoc $year $day $part $path
 		cd ..
 	;;
 	# c++
-	# clojure
+	clojure)
+		cd clojure-aoc
+		lein run $year $day $part $path
+		cd ..
+	;;
 	haskell)
-		cd haskell
+		cd haskell-aoc
 		stack build --silent && stack run -- $year $day $part $path
 		cd ..
 	;;
 	# kotlin
 	java)
-		cd java
+		cd java-aoc
 		javac AOC.java && java AOC $year $day $part $path
 		cd ..
 	;;
 	# odin
 	python)
-		cd python
+		cd python-aoc
 		python3 aoc.py $year $day $part $path
 		cd ..
 	;;
