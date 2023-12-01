@@ -1,6 +1,6 @@
 language=$1
 year=$2
-day=$3
+day=$(printf '%02d' $3)
 part=$4
 example=$5
 

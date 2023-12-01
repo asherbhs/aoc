@@ -1,0 +1,7 @@
+year=$1
+day=$2
+
+curl \
+	-b session=53616c7465645f5fe194a07f6866e9361387ee3bfaf4153376ae784bf958d61ef40cc2470b86dba885a39ff3d86248897384ea905b86aa65b2d4e94daca91382 \
+	https://adventofcode.com/$year/day/$day/input \
+> inputs/$year/input$(printf '%02d' $day).txt
