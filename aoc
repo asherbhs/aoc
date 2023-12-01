@@ -20,14 +20,19 @@ case $language in
 		bqn aoc.bqn $year $day $part $path
 		cd ..
 	;;
+	haskell)
+		cd haskell-aoc
+		stack build && stack run -- $year $day $part $path
+		cd ..
+	;;
 	j)
 		cd j-aoc
 		jconsole aoc.ijs $year $day $part $path
 		cd ..
 	;;
-	haskell)
-		cd haskell-aoc
-		stack build && stack run -- $year $day $part $path
+	odin)
+		cd odin-aoc
+		odin run . -- $year $day $part $path
 		cd ..
 	;;
 	raku)
