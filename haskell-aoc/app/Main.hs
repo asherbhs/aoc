@@ -13,3 +13,6 @@ main = do
             "01" -> case part of
                 "1" -> print $ Year2015.Day01.solvePart1 input
                 "2" -> print $ Year2015.Day01.solvePart2 input
+                _ -> undefined
+            _ -> undefined
+        _ -> undefined

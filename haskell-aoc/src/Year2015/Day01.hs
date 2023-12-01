@@ -1,19 +1,24 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Year2015.Day01 (solvePart1, solvePart2) where
 
+import Data.List (elemIndex)
+import Data.Maybe (fromJust)
+
 solvePart1 :: String -> Int
-solvePart1 = foldr
-    (\c floor -> floor + case c of
+solvePart1 = sum . map
+    (\case
         '(' -> 1
         ')' -> -1
     )
-    0
 
 solvePart2
-    = length
-    . takeWhile (>= 0)
-    . scanl
-        (\floor c -> floor + case c of
+    = succ
+    . fromJust
+    . elemIndex (-1)
+    . scanl1 (+)
+    . map
+        (\case
             '(' -> 1
             ')' -> -1
         )
-        0

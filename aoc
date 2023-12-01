@@ -10,38 +10,34 @@ else path=$(realpath inputs/$year/input$day.txt)
 fi
 
 case $language in
+	apl)
+		cd apl-aoc
+		dyalogscript aoc.apl $year $day $part $path 2> /dev/null
+		cd ..
+	;;
 	bqn)
 		cd bqn-aoc
-		CBQN/BQN aoc.bqn $year $day $part $path
+		bqn aoc.bqn $year $day $part $path
 		cd ..
 	;;
-	c)
-		cd c-aoc
-		gcc -o aoc aoc.c && ./aoc $year $day $part $path
-		cd ..
-	;;
-	# c++
-	clojure)
-		cd clojure-aoc
-		lein run $year $day $part $path
+	j)
+		cd j-aoc
+		jconsole aoc.ijs $year $day $part $path
 		cd ..
 	;;
 	haskell)
 		cd haskell-aoc
-		stack build --silent && stack run -- $year $day $part $path
+		stack build && stack run -- $year $day $part $path
 		cd ..
 	;;
-	# kotlin
-	java)
-		cd java-aoc
-		javac AOC.java && java AOC $year $day $part $path
+	raku)
+		cd raku-aoc
+		raku aoc.raku $year $day $part $path
 		cd ..
 	;;
-	# odin
-	python)
-		cd python-aoc
-		python3 aoc.py $year $day $part $path
+	rust)
+		cd rust-aoc
+		cargo run -- $year $day $part $path
 		cd ..
 	;;
-	# rust
 esac

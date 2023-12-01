@@ -1,3 +1,7 @@
-input ← •FChars 3 ⊑ •args
-solutions ← { y‿d: •Import "year" ∾ y ∾ "/day" ∾ d ∾ ".bqn" } 2 ↑ •args
-•Show { "1": solutions.SolvePart1 input; "2": solutions.SolvePart2 input } 2 ⊑ •args
+year‿day‿part‿path ← •args
+input ← •FChars path
+SolvePart1‿SolvePart2 ← •Import "year"∾year∾"/day"∾day∾".bqn"
+•Show {
+	"1": SolvePart1 input;
+	"2": SolvePart2 input
+} part
