@@ -12,7 +12,7 @@ fi
 case $language in
 	apl)
 		cd apl-aoc
-		dyalogscript aoc.apl $year $day $part $path 2> /dev/null
+		dyalogscript aoc.apl $year $day $part $path
 		cd ..
 	;;
 	bqn)
