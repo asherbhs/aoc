@@ -10,4 +10,3 @@ input←↓⍉↑(2⊃⎕VFI)¨⊃⎕NGET'input.txt'1
 
 ⍝ 'cmpx' ⎕CY 'dfns'
 ⍝ cmpx '+/⊃(⊣×(+/∘.=))/input' '{(l r)←input ⋄ (n c)←↓⍉{⍺,≢⍵}⌸r ⋄ l+.×(c,0)[n⍳l]}⍬'
-
