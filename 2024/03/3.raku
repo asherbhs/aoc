@@ -8,14 +8,9 @@ say $input
 ;
 
 # part 2
-my $do = True;
 say $input
 	.match(/"don't()" || 'do()' || 'mul(' (\d+) ',' (\d+) ')'/, :g)
-	.grep({
-		when "don't()" { $do = False; False }
-		when 'do()'    { $do = True;  False }
-		$do
-	})
+	.grep({!("don't()" fff 'do()') && /mul/})
 	.map({.[0] × .[1]})
 	.sum
 ;
