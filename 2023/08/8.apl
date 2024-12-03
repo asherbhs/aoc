@@ -12,4 +12,4 @@ i←¯1
 
 ⍝ part 2
 (a z)←/∘n¨0 25=⊂26|n
-⎕←{⍵⍕⍨0,⍨⌈10⍟⍵}∧/{i←¯1 ⋄ _←{⍵⊃d[(≢d)|i⊢←1+i]⊃l r}⍣(z∊⍨⊣)⍵ ⋄ 1+i}¨a
+⎕←{⍵⍕⍨0,⍨⌈10⍟⍵}∧/{i←¯1 ⋄ _←{⍵⊃d[(≢d)|i⊢←1+i]⊃l r}⍣(z∊⍨⊣)⍵ ⋄ 1+i}¨a    ⍝ you shouldn't be able to just ∧/ it but hey you can idk
