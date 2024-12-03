@@ -1,5 +1,8 @@
-input←@∾˜•FChars "input.txt"
+input←•FChars "input.txt"
 
+# time←•MonoTime@
+
+input∾↩@
 class←(12|1+"muldon't(,)"⊐input)+12×input∊"0123456789"
 
 d←[
@@ -42,3 +45,5 @@ i←/class∊1‿4
 
 •Show +´                    m×x×y    # part 1
 •Show +´(∾∨`¨dont+`⊸⊔1⌾⊑do)×m×x×y    # part 2
+
+# •Show (•MonoTime@)-time
