@@ -2,7 +2,7 @@ input←⊑•FLines "input.txt"
 
 n←"0123456789"⊐input
 m←2|↕≠n
-disk_map←∾´n⥊¨¯1¨⌾(m⊸/)+`m
+disk_map←∾n⥊¨¯1¨⌾(m⊸/)+`m
 
 map←disk_map
 {
