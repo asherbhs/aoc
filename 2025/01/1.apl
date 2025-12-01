@@ -16,5 +16,5 @@ z←0=100|1↓d                               ⍝ mask of rotations which end on
 ⎕←+/+/[                                   ⍝ sum up:
 	|2-/⌊d÷100                            ⍝   number of hundreds boundaries each rotation passed over
 	l∧z                                   ⍝   if we landed on a zero, and came from above, also count this zero
-	-l∧¯1⌽z                               ⍝   if we came from a zero, and came from above, don't count passing through the start point
+	-l∧0,¯1↓z                             ⍝   if we came from a zero, and came from above, don't count passing through the start point
 ]
