@@ -27,3 +27,6 @@ p←(⌊⍛=10⍟⊢)⍛⊂1+⍳¯1+10*w  ⍝ patterns of each size
 x←10*i×⍳¨⌊d÷i←1+⍳w       ⍝ pattern repetition factors for each size
 n←∪∊p{1↓⍤1+\⍺∘.×⍵}¨x     ⍝ candidate invalid ids
 ⎕←n+.×~2|r⍸n             ⍝ sum those in the supplied ranges
+
+⍝ part 2 as a oneliner for fun
+⎕←n+.×~2|r⍸n←∪∊((⌊⍛=10⍟⊢)⍛⊂1+⍳¯1+10*w){1↓⍤1+\⍺∘.×⍵}¨10*i×⍳¨⌊d÷i←1+⍳w←⌊.5×d←⌈10⍟1+⊢/r
