@@ -17,3 +17,6 @@ Do←{
 ⍝	          └────────┴─ delete the digits we took (and all preceding) from the available digits
 }
 ⎕←+/⊃⊃Do/(⍳12),⊂(j≢⍛⍴⍬ ⋄ ↓j)  ⍝ do 12 digits, and sum up joltages
+
+⍝ part 2 oneliner for fun
+⎕←+/⊃⌽⊃{(j↓¨⍨1+j⍳¨m←(-⍺)⌈/⍤↓¨j←⊃⍵ ⋄ m+10×⊃⌽⍵)}/(⍳12),⊂(↓j ⋄ j≢⍛⍴⍬)
