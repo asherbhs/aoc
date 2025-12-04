@@ -10,8 +10,7 @@ j←⎕D⍳⊃⎕NGET'input.txt'2
 
 ⍝ part 2
 Do←{
-	n←⍺             ⍝ digit we're doing (0-indexed)
-	(x j)←⍵         ⍝ numbers so far, and remaining digits
+	(n (x j))←⍺ ⍵   ⍝ digit we're doing (0-indexed), numbers so far, and remaining digits
 	m←n(⌈/-⍛↓)¨j    ⍝ digits we're going to add (last n are needed later, so don't sample)
 	(
 		m+10×x      ⍝ add digits to end
