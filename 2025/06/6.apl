@@ -3,7 +3,7 @@ x←⊃⎕NGET'example.txt'2             ⍝ input (as a matrix)
 n←↓⍉↑(1⊃⎕VFI)¨↓¯1↓x                ⍝ human-style columns
 m←(0=(¯1+≢x)|⍳⍤≢)⍛⊂1⊃' +*'⎕VFI,⍉x  ⍝ cephalopod-style columns:
 ⍝ │               │└────────────┴───── parse cephalopod-style, abusing the last row as separators
-⍝ └───────────────┴─────────────────── split in column-sized chunks
+⍝ └───────────────┴─────────────────── split into column-sized chunks
 pm←'+'='+*'∩⍨⊢⌿x                   ⍝ mask of columns to sum
 p←⍸ pm                             ⍝ column indices to sum
 t←⍸~pm                             ⍝ column indices to multiply
