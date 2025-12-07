@@ -19,4 +19,4 @@ n←0                      ⍝ accumulator for number of splits
 ⍝ as above, but with no counter, and changing ∨∧ to +× so
 ⍝ we count number of paths rather than just existence.
 ⍝ then, sum the timelines in the end.
-⎕←+/⊃{(⍵×~⍺)+(1∘⌽+¯1∘⌽)⍵×⍺}/x
+⎕←+/⊃{(⍵×~⍺)+1(-⍛⌽+⌽)⍵×⍺}/x
