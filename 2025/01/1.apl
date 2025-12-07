@@ -2,8 +2,8 @@
 
 ⍝ parse
 x←⊃⎕NGET'input.txt'2
-l←'L'=x[;0]         ⍝ mask of rotations which go left (go down)
-n←1⊃' LR'⎕VFI 1↓,x  ⍝ size of each rotation
+l←'L'=x[;0]        ⍝ mask of rotations which go left (go down)
+n←1⊃'LR'⎕VFI 1↓,x  ⍝ size of each rotation
 
 ⍝ part 1
 ⎕←0+.=100|+\50,n×~⍛-l
