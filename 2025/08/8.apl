@@ -12,9 +12,9 @@ w⌽⍨←</(≢w)2⍴≠,w←a[⍋.5*⍨+⌿×⍨-/x[;a];]  ⍝ wires ordered b
 ⍝ part 1
 p←⍳n                         ⍝ parent vector for forest of circuits, initialised to self-loops
 R←{p[⍵]}⍣≡                   ⍝ finds root of a node
-{p[R ⍺]←R ⍵}/⍤1⊢1000↑w       ⍝ find circuits after 1000 connections with a disjoint-set tree:
-⍝│          │└───────┴────────── for each wire
-⍝└──────────┴─────────────────── merge box ⍺'s circuit with box ⍵'s circuit
+_←{p[R ⍺]←R ⍵}/⍤1⊢1000↑w       ⍝ find circuits after 1000 connections with a disjoint-set tree:
+⍝ │           │└───────┴────────── for each wire
+⍝ └───────────┴─────────────────── merge box ⍺'s circuit with box ⍵'s circuit
 ⎕←×/3↑{⍵[⍒⍵]}{≢⍵}⌸{⍵[⍵]}⍣≡p  ⍝ answer:
 ⍝ │         ││   │└───────┴───── circuit id (root) of each box
 ⍝ │         │└───┴────────────── tally up each circuit
