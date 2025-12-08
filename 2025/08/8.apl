@@ -33,3 +33,6 @@ F←{                       ⍝ connect a wire, merging circuits, ⍵: index of 
 ⍝ │     │    └──────┴─││───── connect boxes until all circuits merged
 ⍝ │     └─────────────┴│───── last wire we connected
 ⍝ └────────────────────┴───── product of x-coords of boxes on that wire
+
+⍝ part 2 oneliner for fun
+⎕←×/x[0;w[¯1+{r s←{p[⍵]}⍣≡¨w[⍵;]⋄c-←p[r]≠s⋄p[r]←s⋄⍵+1}⍣{c=1}0;]]⊣p←⍳c←n
