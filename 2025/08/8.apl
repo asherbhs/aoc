@@ -21,12 +21,15 @@ R←{p[⍵]}⍣≡                   ⍝ finds root of a node
 ⍝ └─────────┴─────────────────── product of three largest sizes
 
 ⍝ part 2
-p←⍳n                         ⍝ circuit forest as above
-c←n                          ⍝ number of circuits
-:For (i j) :In ↓w            ⍝ for each wire in order of length:
-	(r s)←{p[⍵]}⍣≡¨i j       ⍝ roots of circuits of i and j
-	c-←p[r]≠s                ⍝ decrement c if r is merging with another circuit
-	p[r]←s                   ⍝ merge box i's circuit with box j's circuit
-	:If c=1 ⋄ :Leave ⋄ :End  ⍝ if all circuits are merged together, we are done
-:End
-⎕←×/x[0;i j]                 ⍝ product of x-coords of the last two boxes connected
+p←⍳n                      ⍝ circuit forest as above
+c←n                       ⍝ number of circuits overall (will go down as we merge them)
+F←{                       ⍝ connect a wire, merging circuits, ⍵: index of next wire to look at
+	(r s)←{p[⍵]}⍣≡¨w[⍵;]  ⍝ roots of circuits each box on this wire
+	c-←p[r]≠s             ⍝ decrement c if r is merging with another circuit
+	p[r]←s                ⍝ merge the circuits
+	⍵+1                   ⍝ next wire
+}
+⎕←×/x[0;w[¯1+F⍣{c=1}0;]]  ⍝ answer:
+⍝ │     │    └──────┴─││───── connect boxes until all circuits merged
+⍝ │     └─────────────┴│───── last wire we connected
+⍝ └────────────────────┴───── product of x-coords of boxes on that wire
