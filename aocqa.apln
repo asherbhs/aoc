@@ -1,0 +1,149 @@
+:Namespace aocqa
+
+⎕IO←0  ⍝ but should be localised when specific value needed
+⎕ML←1
+⎕CT←0  ⍝ I got the need for speed
+⎕PW←12345
+
+⍝ ┌─┬┐
+⍝ │ ││
+⍝ ├─┼┤
+⍝ └─┴┘
+
+y2015d1p1←{            +/¯1*')'=¯1↓⊃⎕NGET ⍵}
+y2015d1p2←{⎕IO←1 ⋄ ¯1⍳⍨+\¯1*')'=¯1↓⊃⎕NGET ⍵}
+
+y2016d1←{
+	x←¯1↓⊃⎕NGET ⍵        ⍝ input     ┌ 0
+	d←4|+\¯1*'L'=x∩'LR'  ⍝ direction─┤3 1
+	(_ n)←⎕VFI x∩⎕D,' '  ⍝ blocks    └ 2
+	d n
+}
+y2016d1p1←{
+	(d n)←y2016d1 ⍵
+	n×←¯1*d>1                 ⍝ negative southwest
+	(|n+.×d∊0 2)+(|n+.×d∊1 3) ⍝ horizontal + vertical displacement
+}
+y2016d1p2←{
+	(d n)←y2016d1 ⍵
+	+/|{⍵[⊃⍸~≠⍵;]}+⍀n⌿(d∊0 2)⌽(⍪¯1*d>1),0
+}
+
+y2017d1p1←{⎕IO←0 ⋄ x+.×x=      1⌽x←⎕D⍳¯1↓⊃⎕NGET ⍵}
+y2017d1p2←{⎕IO←0 ⋄ x+.×x=(.5×≢x)⌽x←⎕D⍳¯1↓⊃⎕NGET ⍵}
+
+y2018d1p1←{+/,⎕CSV ⍵ '' 2}
+y2018d1p2←{
+	∆←+\,⎕CSV ⍵ '' 2
+	⍬{
+		f←⍵+∆
+		∨/m←f∊⍺: ⊃m/f
+		(⍺,f)∇⊢/f
+	}0
+}
+
+y2019d1p1←{+/¯2+⌊3÷⍨,⎕CSV ⍵ '' 2}
+y2019d1p2←{
+	+/0{
+		f←0⌈¯2+⌊⍵÷3
+		f=0: ⍺
+		(⍺+f)∇f
+	}¨,⎕CSV ⍵ '' 2
+}
+
+y2020d1p1←{×/x[⊃⍸2020=    x∘.+x←,⎕CSV ⍵ '' 2]}
+y2020d1p2←{×/x[⊃⍸2020=x∘.+x∘.+x←,⎕CSV ⍵ '' 2]}
+
+y2021d1p1←{+/2</   ,⎕CSV ⍵ '' 2}
+y2021d1p2←{+/2</3+/,⎕CSV ⍵ '' 2}
+
+y2022d1p1←{         ⌈/(+\x=0){+/⍵}⌸x←,⎕CSV ⍵ '' 5}
+y2022d1p2←{+/{⍵[3↑⍒⍵]}(+\x=0){+/⍵}⌸x←,⎕CSV ⍵ '' 5}
+
+y2023d1p1←{
+	⎕IO←0
+	nl←⎕UCS 10
+	x←(⊃⎕NGET ⍵)∩⎕D,nl
+	m←x=nl
+	(10×⎕D⍳x/⍨¯1⌽m)+.+(⎕D⍳x/⍨1⌽m)
+}
+y2023d1p2←{
+	⍝ assumes 0 is not a digit
+	⎕IO←0
+	nl←⎕UCS 10
+	x←⊃⎕NGET ⍵
+	w←'one' 'two' 'three' 'four' 'five' 'six' 'seven' 'eight' 'nine'
+	n←10|⎕D⍳x               ⍝ letter-digits
+	n+←⊃+/(1+⍳9)×w⍷¨⊂x      ⍝ word-digits (marked at first letter)
+	n/⍨←(n>0)∨(x=nl)        ⍝ strip excess
+	m←n=0                   ⍝ line boundaries
+	(10×n/⍨¯1⌽m)+.+(n/⍨1⌽m) ⍝ first and last digit per line
+}
+
+y2024d1←{
+	⎕CSV(⎕OPT (
+		'Separator' ' '
+		'Invert'    1
+	)) ⍵ '' (2 0 0 2)
+}
+y2024d1p1←{
+	(l r)←y2024d1 ⍵
+	+/|l[⍋l]-r[⍋r]
+}
+y2024d1p2←{
+	(l r)←y2024d1 ⍵
+	l+.×+/l∘.=r
+}
+
+y2025d1←{
+	x←⊃⎕NGET ⍵ 2
+	l←'L'=⊣/x
+	(_ t)←'LR'⎕VFI 1↓,x
+	l t
+}
+y2025d1p1←{
+	(l t)←y2025d1 ⍵
+	0+.=100|+\50,t×¯1*l
+}
+y2025d1p2←{
+	(l t)←y2025d1 ⍵
+	d←+\50,t×¯1*l   ⍝ position after rotation (right is positive)
+	z←0=100|1↓d     ⍝ mask of rotations which end on zero
+	+/+/[           ⍝ sum up:
+		|2-/⌊d÷100  ⍝   number of hundreds boundaries each rotation passed over
+		l∧z         ⍝   if we landed on a zero, and came from above, also count this zero
+		-l∧0,¯1↓z   ⍝   if we came from a zero, and came from above, don't count passing through the start point
+	]
+}
+
+∇ Run
+	∆←{⍺≢⍵: ('Incorrect answer: ',,⍕⍵) ⎕SIGNAL 100}
+
+	⍝ 1
+	      74 ∆ y2015d1p1 'inputs/y2015d1.txt'
+	    1795 ∆ y2015d1p2 'inputs/y2015d1.txt'
+	     298 ∆ y2016d1p1 'inputs/y2016d1.txt'
+	     158 ∆ y2016d1p2 'inputs/y2016d1.txt'
+	    1390 ∆ y2017d1p1 'inputs/y2017d1.txt'
+	    1232 ∆ y2017d1p2 'inputs/y2017d1.txt'
+	     477 ∆ y2018d1p1 'inputs/y2018d1.txt'
+	     390 ∆ y2018d1p2 'inputs/y2018d1.txt'
+	 3464458 ∆ y2019d1p1 'inputs/y2019d1.txt'
+	 5193796 ∆ y2019d1p2 'inputs/y2019d1.txt'
+	  793524 ∆ y2020d1p1 'inputs/y2020d1.txt'
+	61515678 ∆ y2020d1p2 'inputs/y2020d1.txt'
+	    1722 ∆ y2021d1p1 'inputs/y2021d1.txt'
+	    1748 ∆ y2021d1p2 'inputs/y2021d1.txt'
+	   70116 ∆ y2022d1p1 'inputs/y2022d1.txt'
+	  206582 ∆ y2022d1p2 'inputs/y2022d1.txt'
+	   55712 ∆ y2023d1p1 'inputs/y2023d1.txt'
+	   55413 ∆ y2023d1p2 'inputs/y2023d1.txt'
+	 1660292 ∆ y2024d1p1 'inputs/y2024d1.txt'
+	22776016 ∆ y2024d1p2 'inputs/y2024d1.txt'
+	    1182 ∆ y2025d1p1 'inputs/y2025d1.txt'
+	    6907 ∆ y2025d1p2 'inputs/y2025d1.txt'
+
+	⎕OFF
+∇
+
+:EndNamespace
