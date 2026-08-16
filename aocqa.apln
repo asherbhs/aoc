@@ -1,5 +1,10 @@
 :Namespace aocqa
 
+⍝ Potential thunks:
+⍝ F/ ⍺ ∘.G ⍵  F⌿ ⍺ ∘.G ⍵
+⍝ {t[⍺;⍵]}/   {t[⍵;⍺]}/
+⍝ ⊣/⍺⌽⍵ for vector ⍺
+
 ⎕IO←0  ⍝ but should be localised when specific value needed
 ⎕ML←1
 ⎕CT←0  ⍝ I got the need for speed
@@ -116,8 +121,163 @@ y2025d1p2←{
 	]
 }
 
+y2015d2←{
+	⎕CSV(⎕OPT(
+		'Separator' 'x'
+		'Invert'    1
+	)) ⍵ '' 2
+}
+y2015d2p1←{
+	(x y z)←y2015d2 ⍵
+	+/(⌊⌿+2×+⌿)[x×y ⋄ y×z ⋄ x×z]
+}
+y2015d2p2←{+/(×⌿+2×+⌿-⌈⌿)↑y2015d2 ⍵}
+
+y2016d2p1←{
+	⎕IO←1
+	t←[
+		1 4 1 2 ⍝ 1
+		2 5 1 3 ⍝ 2
+		3 6 2 3 ⍝ 3
+		1 7 4 5 ⍝ 4
+		2 8 4 6 ⍝ 5
+		3 9 5 6 ⍝ 6
+		4 7 7 8 ⍝ 7
+		5 8 7 9 ⍝ 8
+		6 9 8 9 ⍝ 9
+	] ⍝ U D L R
+	code←⍬
+	_←{
+		button←{t[⍵;⍺]}/('UDLR'⍳⍺),⍵
+		code,←button
+		button
+	}/(⌽¨⌽⊃⎕NGET ⍵ 1),5
+	10⊥code
+}
+y2016d2p2←{
+	⎕IO←1
+	t←[
+		1  3  1  1  ⍝ 1
+		2  6  2  3  ⍝ 2
+		1  7  2  4  ⍝ 3
+		4  8  3  4  ⍝ 4
+		5  5  5  6  ⍝ 5
+		2  10 5  7  ⍝ 6
+		3  11 6  8  ⍝ 7
+		4  12 7  9  ⍝ 8
+		9  9  8  9  ⍝ 9
+		6  10 10 11 ⍝ A
+		7  13 10 12 ⍝ B
+		8  12 11 12 ⍝ C
+		11 13 13 13 ⍝ D
+	] ⍝ U  D  L  R
+	code←⍬
+	_←{
+		button←{t[⍵;⍺]}/('UDLR'⍳⍺),⍵
+		code,←button
+		button
+	}/(⌽¨⌽⊃⎕NGET ⍵ 1),5
+	'123456789ABCD'[code]
+}
+
+y2017d2←{⎕CSV(⎕OPT 'Separator' (⎕UCS 9)) ⍵ '' 2}
+y2017d2p1←{+/(⌈/-⌊/)y2017d2 ⍵}
+y2017d2p2←{
+	x←y2017d2 ⍵
+	d←,∘.≠⍨⍳⊢/⍴x
+	+/{⊃(d∧⌊⍛=)⍛/,⍵∘.÷⍵}⍤1⊢x
+}
+
+y2018d2p1←{×/+⌿∨⌿2 3∘.=⍨+/(⎕C⎕A)∘.=⊃⎕NGET ⍵ 2}
+y2018d2p2←{
+	x←⊃⎕NGET ⍵ 2
+	b←x[⊃⍸(¯1+⊢/⍴x)=+/=⍤1⍤1 2⍨x;]
+	(=⌿b)/⊣⌿b
+}
+
+y2019d2p1←{
+	⎕IO←0
+	(_ n)←',' ⎕VFI ⊃⎕NGET ⍵
+	n[1 2]←12 2
+	{
+		o←n[⍵]
+		o=99: n[0]
+		n[n[⍵+3]]←(⍎'+×'[o=2])/n[n[⍵+1 2]]
+		∇⍵+4
+	}0
+}
+y2019d2p2←{
+	⎕IO←0
+	(_ n)←',' ⎕VFI ⊃⎕NGET ⍵
+	nv←,∘.,⍨⍳100
+	{
+		n←n
+		n[1 2]←⍵⊃nv
+		v←{
+			o←n[⍵]
+			o=99: n[0]
+			n[n[⍵+3]]←(⍎'+×'[o=2])/n[n[⍵+1 2]]
+			∇⍵+4
+		}0
+		v=19690720: 100 1+.×⍵⊃nv
+		∇⍵+1
+	}0
+}
+
+y2020d2←{
+	x←':'~⍨('-'⎕R' ')⊃⎕NGET ⍵
+	(l u c p)←⎕CSV(⎕OPT (
+		'Separator' ' '
+		'Invert'    1
+	)) x 'S' (2 2 1 1)
+	l u (,c) p
+}
+y2020d2p1←{
+	(l u c p)←y2020d2 ⍵
+	+/(l∘≤∧≤∘u)+/c(=⍤0 1)p
+}
+y2020d2p2←{
+	(l u c p)←y2020d2 ⍵
+	(c=⊣/(l-1)⌽p)+.≠(c=⊣/(u-1)⌽p)
+}
+
+y2021d2←{
+	(c n)←⎕CSV(⎕OPT (
+		'Separator' ' '
+		'Invert'    1
+	)) ⍵ '' (1 2)
+	(↓'fud'∘.=⊣/c),⊂n
+}
+y2021d2p1←{(f u d n)←y2021d2 ⍵ ⋄ (n+.×f)×(      n+.×d-u)}
+y2021d2p2←{(f u d n)←y2021d2 ⍵ ⋄ (f+.×n)×(f+.×n×+\n×d-u)}
+
+y2022d2←{
+	(l r)←,¨⎕CSV(⎕OPT (
+		'Separator' ' '
+		'Invert'    1
+	)) ⍵ ''
+	('ABC'=⊂l),('XYZ'=⊂r)
+}
+y2022d2p1←{
+	(a b c x y z)←y2022d2 ⍵
+	+/+/[
+		x+(2×y)+(3×z)       ⍝ our choice
+		3×(x∧a)∨(y∧b)∨(z∧c) ⍝ we draw
+		6×(x∧c)∨(y∧a)∨(z∧b) ⍝ we win
+	]
+}
+y2022d2p2←{
+	(a b c x y z)←y2022d2 ⍵
+	+/+/[
+		(3×y)+(6×z)     ⍝ we draw or win
+		x×b+(2×c)+(3×a) ⍝ our choice if we lose
+		y×a+(2×b)+(3×c) ⍝ our choice if we draw
+		z×c+(2×a)+(3×b) ⍝ our choice if we win
+	]
+}
+
 ∇ Run
-	∆←{⍺≢⍵: ('Incorrect answer: ',,⍕⍵) ⎕SIGNAL 100}
+	∆←{⍺≢⍵: 'Wrong!' ⎕SIGNAL 100}
 
 	⍝ 1
 	      74 ∆ y2015d1p1 'inputs/y2015d1.txt'
@@ -143,7 +303,25 @@ y2025d1p2←{
 	    1182 ∆ y2025d1p1 'inputs/y2025d1.txt'
 	    6907 ∆ y2025d1p2 'inputs/y2025d1.txt'
 
-	⎕OFF
+	⍝ 2
+	   1586300 ∆ y2015d2p1 'inputs/y2015d2.txt'
+	   3737498 ∆ y2015d2p2 'inputs/y2015d2.txt'
+	     53255 ∆ y2016d2p1 'inputs/y2016d2.txt'
+	   '7423A' ∆ y2016d2p2 'inputs/y2016d2.txt'
+	     50376 ∆ y2017d2p1 'inputs/y2017d2.txt'
+	       267 ∆ y2017d2p2 'inputs/y2017d2.txt'
+	      7776 ∆ y2018d2p1 'inputs/y2018d2.txt'
+	'wlkigsqyfecjqqmnxaktdrhbz' ∆ y2018d2p2 'inputs/y2018d2.txt'
+	   9581917 ∆ y2019d2p1 'inputs/y2019d2.txt'
+	      2505 ∆ y2019d2p2 'inputs/y2019d2.txt'
+	       460 ∆ y2020d2p1 'inputs/y2020d2.txt'
+	       251 ∆ y2020d2p2 'inputs/y2020d2.txt'
+	   1924923 ∆ y2021d2p1 'inputs/y2021d2.txt'
+	1982495697 ∆ y2021d2p2 'inputs/y2021d2.txt'
+	     15572 ∆ y2022d2p1 'inputs/y2022d2.txt'
+	     16098 ∆ y2022d2p2 'inputs/y2022d2.txt'
+	
+	⍝ ⎕OFF
 ∇
 
 :EndNamespace
