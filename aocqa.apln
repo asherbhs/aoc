@@ -4,6 +4,8 @@
 ⍝ F/ ⍺ ∘.G ⍵  F⌿ ⍺ ∘.G ⍵
 ⍝ {t[⍺;⍵]}/   {t[⍵;⍺]}/
 ⍝ ⊣/⍺⌽⍵ for vector ⍺
+⍝ 
+⍝ Performance workshop: rock paper scissors
 
 ⎕IO←0  ⍝ but should be localised when specific value needed
 ⎕ML←1
@@ -91,14 +93,8 @@ y2024d1←{
 		'Invert'    1
 	)) ⍵ '' (2 0 0 2)
 }
-y2024d1p1←{
-	(l r)←y2024d1 ⍵
-	+/|l[⍋l]-r[⍋r]
-}
-y2024d1p2←{
-	(l r)←y2024d1 ⍵
-	l+.×+/l∘.=r
-}
+y2024d1p1←{(l r)←y2024d1 ⍵ ⋄ +/|l[⍋l]-r[⍋r]}
+y2024d1p2←{(l r)←y2024d1 ⍵ ⋄ l+.×+/l∘.=r}
 
 y2025d1←{
 	x←⊃⎕NGET ⍵ 2
@@ -192,7 +188,7 @@ y2018d2p1←{×/+⌿∨⌿2 3∘.=⍨+/(⎕C⎕A)∘.=⊃⎕NGET ⍵ 2}
 y2018d2p2←{
 	x←⊃⎕NGET ⍵ 2
 	b←x[⊃⍸(¯1+⊢/⍴x)=+/=⍤1⍤1 2⍨x;]
-	(=⌿b)/⊣⌿b
+	(=⌿b)/⊣⌿b  ⍝ wish this could be a nice train :(
 }
 
 y2019d2p1←{
@@ -225,21 +221,15 @@ y2019d2p2←{
 }
 
 y2020d2←{
-	x←':'~⍨('-'⎕R' ')⊃⎕NGET ⍵
+	x←':'~⍨'-'⎕R' '⊃⎕NGET ⍵
 	(l u c p)←⎕CSV(⎕OPT (
 		'Separator' ' '
 		'Invert'    1
 	)) x 'S' (2 2 1 1)
 	l u (,c) p
 }
-y2020d2p1←{
-	(l u c p)←y2020d2 ⍵
-	+/(l∘≤∧≤∘u)+/c(=⍤0 1)p
-}
-y2020d2p2←{
-	(l u c p)←y2020d2 ⍵
-	(c=⊣/(l-1)⌽p)+.≠(c=⊣/(u-1)⌽p)
-}
+y2020d2p1←{(l u c p)←y2020d2 ⍵ ⋄ +/(l∘≤∧≤∘u)+/c(=⍤0 1)p}
+y2020d2p2←{(l u c p)←y2020d2 ⍵ ⋄ (c=⊣/(l-1)⌽p)+.≠(c=⊣/(u-1)⌽p)}
 
 y2021d2←{
 	(c n)←⎕CSV(⎕OPT (
@@ -321,7 +311,7 @@ y2022d2p2←{
 	     15572 ∆ y2022d2p1 'inputs/y2022d2.txt'
 	     16098 ∆ y2022d2p2 'inputs/y2022d2.txt'
 	
-	⍝ ⎕OFF
+	⎕OFF
 ∇
 
 :EndNamespace
