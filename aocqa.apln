@@ -1,11 +1,18 @@
 :Namespace aocqa
 
+⍝ Collected Advent of Code solutions
+⍝ Trying to use a flat style as much as possible
+
 ⍝ Potential thunks:
 ⍝ F/ ⍺ ∘.G ⍵  F⌿ ⍺ ∘.G ⍵
 ⍝ {t[⍺;⍵]}/   {t[⍵;⍺]}/
 ⍝ ⊣/⍺⌽⍵ for vector ⍺
+⍝ ⊃⍺/⍵
+⍝ a[⍸b]       a[⍸b]←c
 ⍝ 
 ⍝ Performance workshop: rock paper scissors
+⍝
+⍝ Error messages: high-rank union, stencil
 
 ⎕IO←0  ⍝ but should be localised when specific value needed
 ⎕ML←1
@@ -266,9 +273,73 @@ y2022d2p2←{
 	]
 }
 
+y2023d2←{
+	x←⊃⎕NGET⍵
+	x/⍨←(≠\x∊':',⎕UCS 10)∧(x∊⎕D,':;')∨(¯1⌽x=' ')    ⍝ strip fluff: :1b8g;14g15b;3g9b;8g8b1r;1r9g10b:3b1g2r; ..
+	c←('rgb'∘.=x∩'rgb')(×⍤1)¯1↓⊃⌽'rgb' ⎕VFI x~':;'  ⍝ parse cubes to 3×n matrix (rgb×games)
+	m←(~¯1⌽⊢)⍛/':'=x∩':rgb'                         ⍝ mask of game starts
+	⍉↑⌈/¨m⊂c                                        ⍝ max of each colour over each game (flat ver is slow)
+}
+y2023d2p1←{⎕IO←1 ⋄ +/⍸12 13 14∧.≥y2023d2 ⍵}
+y2023d2p2←{+/×⌿y2023d2 ⍵}
+
+⍝ making this flat seems rough
+y2024d2←{{⊃⌽⎕VFI⍵}¨⊃⎕NGET ⍵ 1}
+y2024d2p1←{+/{((∧/≥∨/)2</⍵)∧(1∘≤∧.∧≤∘3)|2-/⍵}¨y2024d2 ⍵}
+y2024d2p2←{
+	n←y2024d2 ⍵
+	S←{((∧/≥∨/)2</⍵)∧∧/(1∘≤∧≤∘3)|2-/⍵}
+	+/(S¨n)∨{∨/S ⍵/⍨⍤1∘.≠⍨⍳≢⍵}¨n
+}
+
+y2015d3p1←{≢∪+⍀0 0⍪[0 1 ⋄ 0 ¯1 ⋄ ¯1 0 ⋄ 1 0]['^v<>'⍳¯1↓⊃⎕NGET ⍵;]}
+y2015d3p2←{≢∪(2|⍳∘≢)⍛(⌿⍪⍥(+⍀0 0⍪⊢)~⍛⌿)[0 1 ⋄ 0 ¯1 ⋄ ¯1 0 ⋄ 1 0]['^v<>'⍳¯1↓⊃⎕NGET ⍵;]}
+
+y2016d3p1←{+/ (⌈/<+/-⌈/)           (≢x) 3⍴⊃⌽⎕VFI,x←⊃⎕NGET ⍵ 2}
+y2016d3p2←{+/,(⌈/<+/-⌈/)0 2 1⍉(3÷⍨≢x) 3 3⍴⊃⌽⎕VFI,x←⊃⎕NGET ⍵ 2}
+
+y2017d3p1←{
+	n←n-~2|n←⌊⍵*.5    ⍝ side-length of inner square
+	d←(n+1)|⍵-n×n     ⍝ distance anti-clockwise from corner
+	(⌈n÷2)+|d-.5×n+1  ⍝ (from centre to side) + (to middle of side)
+}
+y2017d3p2←{
+	n←⍵
+	{
+		x←+\{+/⍵}⌺3⊢⌿⍵  ⍝ next bottom row
+		∨/m←x>n: ⊃m/x   ⍝ found answer?
+		∇ ⌽⍉⍵⍪x         ⍝ add next batch, rotate, go again
+	}1 2⍴1
+}
+
+y2018d3←{
+	x←⊃⎕NGET ⍵
+	x[⍸x∊'@:x']←','
+	⎕CSV x 'S' (0 2 2 2 2)
+}
+∇ r←y2018d3p1 path;⎕IO;f;x;y;w;h
+	⎕IO←0
+	f←1000 1000⍴0
+	:For x y w h :in ↓y2018d3 path
+		f[y+⍳h;x+⍳w]+←1
+	:End
+	r←2+.≤,f
+∇
+∇ r←y2018d3p2 path;⎕IO;f;c;x;y;w;h;i;a
+	⎕IO←0
+	c←y2018d3 path
+	n←≢c
+	f←1000 1000 n⍴0
+	:For (x y w h) i :InEach (↓c) (⍳n)
+		f[y+⍳h;x+⍳w;i]←1
+	:End
+	r←1+⊃⍸(×/c[;2 3])=+⌿+⌿f(×⍤1 0)1=+/f
+∇
+
 ∇ Run
 	∆←{⍺≢⍵: 'Wrong!' ⎕SIGNAL 100}
 
+	⍝ 25-day years
 	⍝ 1
 	      74 ∆ y2015d1p1 'inputs/y2015d1.txt'
 	    1795 ∆ y2015d1p2 'inputs/y2015d1.txt'
@@ -290,8 +361,6 @@ y2022d2p2←{
 	   55413 ∆ y2023d1p2 'inputs/y2023d1.txt'
 	 1660292 ∆ y2024d1p1 'inputs/y2024d1.txt'
 	22776016 ∆ y2024d1p2 'inputs/y2024d1.txt'
-	    1182 ∆ y2025d1p1 'inputs/y2025d1.txt'
-	    6907 ∆ y2025d1p2 'inputs/y2025d1.txt'
 
 	⍝ 2
 	   1586300 ∆ y2015d2p1 'inputs/y2015d2.txt'
@@ -310,6 +379,25 @@ y2022d2p2←{
 	1982495697 ∆ y2021d2p2 'inputs/y2021d2.txt'
 	     15572 ∆ y2022d2p1 'inputs/y2022d2.txt'
 	     16098 ∆ y2022d2p2 'inputs/y2022d2.txt'
+	      2164 ∆ y2023d2p1 'inputs/y2023d2.txt'
+	     69929 ∆ y2023d2p2 'inputs/y2023d2.txt'
+	       572 ∆ y2024d2p1 'inputs/y2024d2.txt'
+	       612 ∆ y2024d2p2 'inputs/y2024d2.txt'
+
+	⍝ 3
+	  2572 ∆ y2015d3p1 'inputs/y2015d3.txt'
+	  2631 ∆ y2015d3p2 'inputs/y2015d3.txt'
+	   862 ∆ y2016d3p1 'inputs/y2016d3.txt'
+	  1577 ∆ y2016d3p2 'inputs/y2016d3.txt'
+	   326 ∆ y2017d3p1 361527
+	363010 ∆ y2017d3p2 361527
+	112378 ∆ y2018d3p1 'inputs/y2018d3.txt'
+	   603 ∆ y2018d3p2 'inputs/y2018d3.txt'
+
+	⍝ 12-day years
+	⍝ 1
+	1182 ∆ y2025d1p1 'inputs/y2025d1.txt'
+	6907 ∆ y2025d1p2 'inputs/y2025d1.txt'
 	
 	⎕OFF
 ∇
