@@ -13,6 +13,7 @@
 ⍝ +⌿+⌿   +/+/  etc
 ⍝ a[b,¨c]
 ⍝ F/¨⊆
+⍝ ↑⍸⍵  ↓⍉↑⍸⍵
 ⍝ 
 ⍝ Performance workshop: rock paper scissors
 ⍝
@@ -352,34 +353,33 @@ y2019d3←{
 	(a b)←⊃⎕NGET ⍵ 1
 	P←{
 		d←[0 1 ⋄ 0 ¯1 ⋄ ¯1 0 ⋄ 1 0]['UDLR'⍳⍵∩'UDLR';]
-		n←⊃⌽','⎕VFI ⍵~'UDLR'
-		(⊂0,¯1↓+\n),↓⍉+⍀0 0⍪n×[0]d
+		(_ n)←','⎕VFI ⍵~'UDLR'
+		(⊂0,¯1↓+\n),↓⍉+⍀0 0⍪n×[0]d  ⍝ prefix steps, x positions, y positions
 	}
-	(P a),(P b)
+	(as ax ay)←P a
+	(bs bx by)←P b
+	(axl ayl bxl byl)←¯1↓¨ax ay bx by               ⍝ shape:   is:
+	axibx←((0=+⌿)∧(¯1=×⌿))[bxl ⋄ 1↓bx](∘.<-∘.>)axl  ⍝ b-1 a-1  vertical   a in b segment
+	ayiby←((0=+⌿)∧(¯1=×⌿))[byl ⋄ 1↓by](∘.<-∘.>)ayl  ⍝ b-1 a-1  horizontal a in b segment
+	bxiax←((0=+⌿)∧(¯1=×⌿))[axl ⋄ 1↓ax](∘.<-∘.>)bxl  ⍝ a-1 b-1  vertical   b in a segment
+	byiay←((0=+⌿)∧(¯1=×⌿))[ayl ⋄ 1↓ay](∘.<-∘.>)byl  ⍝ a-1 b-1  horizontal b in a segment
+	(i j)←↓⍉↑⍸byiay∧⍉axibx  ⍝ vertical a intersects horizontal b
+	(k l)←↓⍉↑⍸ayiby∧⍉bxiax  ⍝ vertical b intersects vertical a
+	as ax ay bs bx by i j k l
 }
 y2019d3p1←{
-	(_ ax ay _ bx by)←y2019d3 ⍵
-	axibx←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)bx)(∘.<-∘.>)¯1↓ax
-	ayiby←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)by)(∘.<-∘.>)¯1↓ay
-	bxiax←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)ax)(∘.<-∘.>)¯1↓bx
-	byiay←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)ay)(∘.<-∘.>)¯1↓by
-	d ←⌊/ax[i]+⍥|by[j]⊣(i j)←↓⍉↑⍸byiay∧⍉axibx
-	d⌊←⌊/bx[i]+⍥|ay[j]⊣(i j)←↓⍉↑⍸ayiby∧⍉bxiax
-	d
+	(_ ax ay _ bx by i j k l)←y2019d3 ⍵
+	d←⌊/ax[i]+⍥|by[j]
+	d⌊⌊/bx[k]+⍥|ay[l]
 }
 y2019d3p2←{
-	(as ax ay bs bx by)←y2019d3 ⍵
-	axibx←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)bx)(∘.<-∘.>)¯1↓ax
-	ayiby←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)by)(∘.<-∘.>)¯1↓ay
-	bxiax←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)ax)(∘.<-∘.>)¯1↓bx
-	byiay←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)ay)(∘.<-∘.>)¯1↓by
-	d ←⌊/as[i]+bs[j]+(|ay[i]-by[j])+(|bx[j]-ax[i])⊣(i j)←↓⍉↑⍸byiay∧⍉axibx
-	d⌊←⌊/bs[i]+as[j]+(|by[i]-ay[j])+(|ax[j]-bx[i])⊣(i j)←↓⍉↑⍸ayiby∧⍉bxiax
-	d
+	(as ax ay bs bx by i j k l)←y2019d3 ⍵
+	d←⌊/as[i]+bs[j]+(|ay[i]-by[j])+(|bx[j]-ax[i])
+	d⌊⌊/bs[k]+as[l]+(|by[k]-ay[l])+(|ax[l]-bx[k])
 }
 y2019d3p2old←{
-	⍝ this just simulates laying the wires consequently takes
-	⍝ a lot of time and space
+	⍝ this just simulates laying the wires and consequently
+	⍝ takes a lot of time and space
 
 	⎕IO←0
 	(a b)←⊃⎕NGET ⍵ 1
@@ -574,7 +574,7 @@ y2024d3p2←{
 	   903810 ∆ y2021d3p2 'inputs/y2021d3.txt'
 	     8176 ∆ y2022d3p1 'inputs/y2022d3.txt'
 	     2689 ∆ y2022d3p2 'inputs/y2022d3.txt'
-	  , 527446 ∆ y2023d3p1 'inputs/y2023d3.txt'
+	   527446 ∆ y2023d3p1 'inputs/y2023d3.txt'
 	 73201705 ∆ y2023d3p2 'inputs/y2023d3.txt'
 	173731097 ∆ y2024d3p1 'inputs/y2024d3.txt'
 	 93729253 ∆ y2024d3p2 'inputs/y2024d3.txt'
