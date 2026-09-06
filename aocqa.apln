@@ -1,18 +1,28 @@
 :Namespace aocqa
 
 ⍝ Collected Advent of Code solutions
-⍝ Trying to use a flat style as much as possible
+⍝ Trying to use a flat style where feasible
+⍝ Performance is nice, brevity is nice, neither are primary goals
 
 ⍝ Potential thunks:
 ⍝ F/ ⍺ ∘.G ⍵  F⌿ ⍺ ∘.G ⍵
 ⍝ {t[⍺;⍵]}/   {t[⍵;⍺]}/
 ⍝ ⊣/⍺⌽⍵ for vector ⍺
 ⍝ ⊃⍺/⍵
-⍝ a[⍸b]       a[⍸b]←c
+⍝ a[⍸b]  a[⍸b]←c
+⍝ +⌿+⌿   +/+/  etc
+⍝ a[b,¨c]
+⍝ F/¨⊆
 ⍝ 
 ⍝ Performance workshop: rock paper scissors
 ⍝
-⍝ Error messages: high-rank union, stencil
+⍝ Error messages:
+⍝ high-rank union
+⍝ stencil window too large
+⍝ power array left operand
+⍝
+⍝ Bugs:
+⍝ <IT> scripted namespace
 
 ⎕IO←0  ⍝ but should be localised when specific value needed
 ⎕ML←1
@@ -333,10 +343,173 @@ y2018d3←{
 	:For (x y w h) i :InEach (↓c) (⍳n)
 		f[y+⍳h;x+⍳w;i]←1
 	:End
-	r←1+⊃⍸(×/c[;2 3])=+⌿+⌿f(×⍤1 0)1=+/f
+	r←1+⊃⍸(×/c[;2 3])=+⌿+⌿f×(⍤1 0)1=+/f
 ∇
 
+⍝ NB. I assume the two wires never intersect while parallel: --XX--
+y2019d3←{
+	⎕IO←0
+	(a b)←⊃⎕NGET ⍵ 1
+	P←{
+		d←[0 1 ⋄ 0 ¯1 ⋄ ¯1 0 ⋄ 1 0]['UDLR'⍳⍵∩'UDLR';]
+		n←⊃⌽','⎕VFI ⍵~'UDLR'
+		(⊂0,¯1↓+\n),↓⍉+⍀0 0⍪n×[0]d
+	}
+	(P a),(P b)
+}
+y2019d3p1←{
+	(_ ax ay _ bx by)←y2019d3 ⍵
+	axibx←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)bx)(∘.<-∘.>)¯1↓ax
+	ayiby←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)by)(∘.<-∘.>)¯1↓ay
+	bxiax←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)ax)(∘.<-∘.>)¯1↓bx
+	byiay←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)ay)(∘.<-∘.>)¯1↓by
+	d ←⌊/ax[i]+⍥|by[j]⊣(i j)←↓⍉↑⍸byiay∧⍉axibx
+	d⌊←⌊/bx[i]+⍥|ay[j]⊣(i j)←↓⍉↑⍸ayiby∧⍉bxiax
+	d
+}
+y2019d3p2←{
+	(as ax ay bs bx by)←y2019d3 ⍵
+	axibx←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)bx)(∘.<-∘.>)¯1↓ax
+	ayiby←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)by)(∘.<-∘.>)¯1↓ay
+	bxiax←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)ax)(∘.<-∘.>)¯1↓bx
+	byiay←((0=+⌿)∧(¯1=×⌿))(1 ¯1↓(⍤0 1)ay)(∘.<-∘.>)¯1↓by
+	d ←⌊/as[i]+bs[j]+(|ay[i]-by[j])+(|bx[j]-ax[i])⊣(i j)←↓⍉↑⍸byiay∧⍉axibx
+	d⌊←⌊/bs[i]+as[j]+(|by[i]-ay[j])+(|ax[j]-bx[i])⊣(i j)←↓⍉↑⍸ayiby∧⍉bxiax
+	d
+}
+y2019d3p2old←{
+	⍝ this just simulates laying the wires consequently takes
+	⍝ a lot of time and space
+
+	⎕IO←0
+	(a b)←⊃⎕NGET ⍵ 1
+	P←{
+		d←[0 1 ⋄ 0 ¯1 ⋄ ¯1 0 ⋄ 1 0]['UDLR'⍳⍵∩'UDLR';]
+		n←⊃⌽','⎕VFI ⍵~'UDLR'
+		+⍀0 0⍪n×[0]d
+	}
+	a←P a
+	b←P b
+	l←(⌊⌿a)⌊(⌊⌿b)
+	u←(⌈⌿a)⌈(⌈⌿b)
+	o←(+/+/|2-⌿a)⌈(+/+/|2-⌿b)
+	w←(1+u-l)⍴o
+	((-l)⌷w)←0
+	wa←wb←w
+	_←2{
+		m←⍺⌊⍵
+		d←|⍺-⍵
+		x←(0⌷m) +⍳1+0⌷d
+		y←(1⌷m) +⍳1+1⌷d
+		z←(⍺⌷wa)+⍳1+⌈/d
+		wa[x;y]⌊←⌽(⍣(m≢⍺))z
+		1
+	}/↓a-(⍤1)l
+	_←2{
+		m←⍺⌊⍵
+		d←|⍺-⍵
+		x←(0⌷m) +⍳1+0⌷d
+		y←(1⌷m) +⍳1+1⌷d
+		z←(⍺⌷wb)+⍳1+⌈/d
+		wb[x;y]⌊←⌽(⍣(m≢⍺))z
+		1
+	}/↓b-(⍤1)l
+	((-l)⌷wa)←o ⋄ ((-l)⌷wb)←o
+	⌊/(,(o≠wa)∧(o≠wb))/,wa+wb
+}
+
+y2020d3p1←{
+	⎕IO←0
+	x←⊃⎕NGET ⍵ 2
+	'#'+.=x[i,¨(⊢/⍴x)|3×i←⍳≢x]
+}
+y2020d3p2←{
+	⎕IO←0
+	x←⊃⎕NGET ⍵ 2
+	i←⍳≢x
+	w←⊢/⍴x
+	×/(
+		'#'+.=x[    i,¨w|1×i]
+		'#'+.=x[    i,¨w|3×i]
+		'#'+.=x[    i,¨w|5×i]
+		'#'+.=x[    i,¨w|7×i]
+		'#'+.=x[(2×i),¨w|i←⍳⌈.5×≢x]
+	)
+}
+
+y2021d3p1←{
+	x←'1'=⊃⎕NGET ⍵ 2
+	×/2⊥⍉↑d(~d←(+⌿>.5×≢)x)
+}
+y2021d3p2←{
+	x←'1'=⊃⎕NGET ⍵ 2
+	_F←{
+		⍺←0
+		1=≢⍵: ⍵
+		(⍺+1)∇⍵⌿⍨(+/⍺⍺.5×≢)⍛=⍵[;⍺]
+	}
+	×/2⊥⍉(≥_F⍪<_F)x
+}
+
+y2022d3p1←{⎕IO←1 ⋄ x←⊃⎕NGET ⍵ 1 ⋄ +/(⎕C⍛,⎕A)⍳(.5×≢)⍛(⊃↑∩↓)¨x}
+y2022d3p2←{⎕IO←1 ⋄ x←⊃⎕NGET ⍵ 1 ⋄ +/(⎕C⍛,⎕A)⍳⊃¨∩/(3÷⍨≢x)3⍴x}
+
+y2023d3←{
+	⎕IO←0
+	x←⊃⎕NGET ⍵ 2
+	x,←'.'  ⍝ defensive: separate numbers in ravel
+	y←,x
+	m←y∊⎕D
+	n←⌽10⊥10|⎕D⍳⍉⌽↑m⊆⍥⌽y
+	x y m n
+}
+y2023d3p1←{
+	(x _ m n)←y2023d3 ⍵
+	+/n/⍨m(∨/¨⊆),{∨/,⍵}(⌺3 3)~x∊' .',⎕D
+}
+y2023d3p2←{
+	⎕IO←0
+	(x y m n)←y2023d3 ⍵
+	id←x⍴⍛⍴1↓∪⍛⍳(+\~)⍛×0,m           ⍝ id for each number
+	g←⍸x='*'                         ⍝ prospective gears (nested indices yuck)
+	p←↓id[(⍴x)∘⌊¨0⌈g∘.+,∘.,⍨¯1 0 1]  ⍝ prospective gear parts
+	+/×/(1,n)[↑(3=≢¨)⍛/∪¨p]          ⍝ ratio sum of real gears
+}
+
+y2024d3←{
+	(x i)←⍵
+	z←0
+	a←b←i×0
+	s←i×0                                           ⍝ state: 012345678
+	S←{                                             ⍝        (nnn,nnn)
+		i+←1 ⋄ i/⍨←i<≢x ⋄ xi←x[i]                   ⍝ advance
+		d←xi∊⎕D ⋄ c←xi=',' ⋄ p←xi=')'               ⍝ what we got
+		m←(d∧s∊0 1 2 4 5 6)∨(c∧s∊1 2 3)∨(p∧s∊5 6 7) ⍝ ok
+		(s i xi d c p a b)/⍨←⊂m                     ⍝ keep
+		s+←1 ⋄ s⌈←(4×c)+(8×p)                       ⍝ next
+		m←s∊1 2 3 ⋄ (m/a)×←10 ⋄ (m/a)+←⎕D⍳m/xi      ⍝ (nnn,   )
+		m←s∊5 6 7 ⋄ (m/b)×←10 ⋄ (m/b)+←⎕D⍳m/xi      ⍝ (   ,nnn)
+		m←s=8 ⋄ z+←+/(m/a)×(m/b) ⋄ (s i a b)/⍨←⊂~m  ⍝ finished
+	1}
+	z⊣S¨⍳8
+}
+y2024d3p1←{
+	x←⊃⎕NGET ⍵
+	i←3+⍸'mul('⍷x
+	y2024d3 x i
+}
+y2024d3p2←{
+	x←⊃⎕NGET ⍵
+	i←3+⍸'mul('⍷x
+	y← 0,⍸'do()'⍷x
+	n←¯1,⍸'don''t()'⍷x
+	i/⍨←y[y⍸i]>n[n⍸i]
+	y2024d3 x i
+}
+
 ∇ Run
+	⍝ ⎕PROFILE 'start'
+
 	∆←{⍺≢⍵: 'Wrong!' ⎕SIGNAL 100}
 
 	⍝ 25-day years
@@ -385,14 +558,26 @@ y2018d3←{
 	       612 ∆ y2024d2p2 'inputs/y2024d2.txt'
 
 	⍝ 3
-	  2572 ∆ y2015d3p1 'inputs/y2015d3.txt'
-	  2631 ∆ y2015d3p2 'inputs/y2015d3.txt'
-	   862 ∆ y2016d3p1 'inputs/y2016d3.txt'
-	  1577 ∆ y2016d3p2 'inputs/y2016d3.txt'
-	   326 ∆ y2017d3p1 361527
-	363010 ∆ y2017d3p2 361527
-	112378 ∆ y2018d3p1 'inputs/y2018d3.txt'
-	   603 ∆ y2018d3p2 'inputs/y2018d3.txt'
+	     2572 ∆ y2015d3p1 'inputs/y2015d3.txt'
+	     2631 ∆ y2015d3p2 'inputs/y2015d3.txt'
+	      862 ∆ y2016d3p1 'inputs/y2016d3.txt'
+	     1577 ∆ y2016d3p2 'inputs/y2016d3.txt'
+	      326 ∆ y2017d3p1 361527
+	   363010 ∆ y2017d3p2 361527
+	   112378 ∆ y2018d3p1 'inputs/y2018d3.txt'
+	      603 ∆ y2018d3p2 'inputs/y2018d3.txt'
+	     4981 ∆ y2019d3p1 'inputs/y2019d3.txt'
+	   164012 ∆ y2019d3p2 'inputs/y2019d3.txt'
+	      282 ∆ y2020d3p1 'inputs/y2020d3.txt'
+	958815792 ∆ y2020d3p2 'inputs/y2020d3.txt'
+	   741950 ∆ y2021d3p1 'inputs/y2021d3.txt'
+	   903810 ∆ y2021d3p2 'inputs/y2021d3.txt'
+	     8176 ∆ y2022d3p1 'inputs/y2022d3.txt'
+	     2689 ∆ y2022d3p2 'inputs/y2022d3.txt'
+	  , 527446 ∆ y2023d3p1 'inputs/y2023d3.txt'
+	 73201705 ∆ y2023d3p2 'inputs/y2023d3.txt'
+	173731097 ∆ y2024d3p1 'inputs/y2024d3.txt'
+	 93729253 ∆ y2024d3p2 'inputs/y2024d3.txt'
 
 	⍝ 12-day years
 	⍝ 1
@@ -400,6 +585,9 @@ y2018d3←{
 	6907 ∆ y2025d1p2 'inputs/y2025d1.txt'
 	
 	⎕OFF
+	⍝ ⎕PROFILE 'stop'
+	⍝ (depth fn line hits exc inc)←1 2 3 4 5 6 ⎕PROFILE 'tree'
+	⍝ aocqa.({⍵[⍒⊢/⍵;]}fn{⍺(+/⍵)}⌸exc)  ⍝ who is slow
 ∇
 
 :EndNamespace
