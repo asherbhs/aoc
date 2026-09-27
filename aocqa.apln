@@ -4,27 +4,6 @@
 ⍝ Trying to use a flat style where feasible
 ⍝ Performance is nice, brevity is nice, neither are primary goals
 
-⍝ Potential thunks:
-⍝ F/ ⍺ ∘.G ⍵  F⌿ ⍺ ∘.G ⍵
-⍝ {t[⍺;⍵]}/   {t[⍵;⍺]}/
-⍝ ⊣/⍺⌽⍵ for vector ⍺
-⍝ ⊃⍺/⍵
-⍝ a[⍸b]  a[⍸b]←c
-⍝ +⌿+⌿   +/+/  etc
-⍝ a[b,¨c]
-⍝ F/¨⊆
-⍝ ↑⍸⍵  ↓⍉↑⍸⍵
-⍝ 
-⍝ Performance workshop: rock paper scissors
-⍝
-⍝ Error messages:
-⍝ high-rank union
-⍝ stencil window too large
-⍝ power array left operand
-⍝
-⍝ Bugs:
-⍝ <IT> scripted namespace
-
 ⎕IO←0  ⍝ but should be localised when specific value needed
 ⎕ML←1
 ⎕CT←0  ⍝ I got the need for speed
@@ -51,7 +30,7 @@ y2016d1p1←{
 }
 y2016d1p2←{
 	(d n)←y2016d1 ⍵
-	+/|{⍵[⊃⍸~≠⍵;]}+⍀n⌿(d∊0 2)⌽(⍪¯1*d>1),0
+	+/|{⍵[1⍳⍨~≠⍵;]}+⍀n⌿(d∊0 2)⌽(⍪¯1*d>1),0
 }
 
 y2017d1p1←{⎕IO←0 ⋄ x+.×x=      1⌽x←⎕D⍳¯1↓⊃⎕NGET ⍵}
@@ -507,10 +486,284 @@ y2024d3p2←{
 	y2024d3 x i
 }
 
+y2016d4p1←{
+	a←⎕C⎕A
+	x←⊃⎕NGET ⍵
+	(_ id)←'['⎕VFI x∩⎕D,'[' ⋄ id↓⍨←¯1
+	m←≠\x∊'[]'
+	ch←1↓(⍤1)(≢id ⋄ 6)⍴m/x
+	x/⍨←~m∨x∊⎕D,']-'
+	id+.×ch≡(⍤1)a[(5↑⍒)(⍤1)¯2-⌿0⍪(x=⎕UCS 10)⌿+⍀x∘.=a]
+}
+y2016d4p2←{
+	⎕IO←0
+	a←⎕C⎕A
+	x←⊃⎕NGET ⍵
+	(_ id)←'['⎕VFI x∩⎕D,'[' ⋄ id↓⍨←¯1
+	m←≠\x∊'[]'
+	x/⍨←~m∨x∊⎕D,']-'
+	x↓⍨←¯1
+	m←x=⎕UCS 10
+	id←id[+\m]
+	⊃id/⍨'northpoleobjectstorage'⍷(a,⎕UCS 10)[(26×m)+m~⍛×26|id+a⍳x]
+}
+
+⍝ yuck!
+y2017d4p1←{+/(∧/≠)¨                 ' '(≠⊆⊢)¨⊃⎕NGET ⍵ 1}
+y2017d4p2←{+/{∧/≠↑(⊂⎕C⎕A)(+/∘.=)¨⍵}¨' '(≠⊆⊢)¨⊃⎕NGET ⍵ 1}
+
+y2018d4←{
+	x←⊃⎕NGET ⍵ 2
+	xmonth←10 1+.×⍉⎕D⍳x[; 6  7] ⍝ MM-
+	xday  ←10 1+.×⍉⎕D⍳x[; 9 10] ⍝   -DD
+	xhour ←10 1+.×⍉⎕D⍳x[;12 13] ⍝       HH:
+	xmin  ←10 1+.×⍉⎕D⍳x[;15 16] ⍝         :MM
+	what  ←x[;19]               ⍝             Guard #
+
+	⍝ assumptions: all one year, nothing on nye
+	days←31 28 31 30 31 30 31 31 30 31 30 31
+	xday+←xhour=23
+	m←xday>days[xmonth-1]
+	(m/xday)←1
+	(m/xmonth)+←1
+
+	ydate←∪⍉[xmonth ⋄ xday]
+	y←(≢ydate)60⍴0
+
+	m←what='G'
+	(_ xguard)←'#'⎕VFI(,25↓(⍤1)m⌿x)∩('#',⎕D) ⋄ xguard↓⍨←1
+	xdate←⍉[m/xmonth ⋄ m/xday]
+	yguard←y≢⍛/0 ⋄ yguard[ydate⍳xdate]←xguard
+
+	i←ydate⍳⍉↑xmonth xday
+	m←what='f' ⋄ y[(m/i),¨(m/xmin)]←1
+	m←what='w' ⋄ y[(m/i),¨(m/xmin)]←¯1
+	y←+\y
+
+	y yguard
+}
+y2018d4p1←{
+	(y yguard)←y2018d4 ⍵
+	guard←⊃⊃{⍺/⍨⌈/⍛=⍵}/↓⍉yguard{⍺,+/⍵}⌸+/y
+	guard×(⊢⍳⌈/)+⌿y⌿⍨yguard=guard
+}
+y2018d4p2←{
+	(y yguard)←y2018d4 ⍵
+	(guard max min)←↓⍉yguard{(⍺ ⋄ m←⌈/x←+⌿⍵ ⋄ x⍳m)}⌸y
+	(guard×min)[max⍳⌈/max]
+}
+
+y2019d4←{
+	⎕IO←0
+	(l u)←⍵
+	n←(10/⍨⌈10⍟u)⊤l+⍳1+u-l ⍝ digits
+	n/⍨←∧⌿n=⌈⍀n            ⍝ only nondecreasing
+	n
+}
+y2019d4p1←{
+	n←y2019d4 ⍵
+	+/∨⌿1(↓=-⍛↓)n          ⍝ start of pair
+}
+y2019d4p2←{
+	n←y2019d4 ⍵
+	m ←0(⍪⍨>⍪)2=⌿n         ⍝ start of group
+	m∧←1⍪⍨(⍣2)2(↓≠-⍛↓)n    ⍝ not 2 behind another in grup
+	+/∨⌿m
+}
+
+y2020d4p1←{
+	nl←⎕UCS 10
+	x←nl,⍨⊃⎕NGET ⍵
+	f←'byr' 'iyr' 'eyr' 'hgt' 'hcl' 'ecl' 'pid'
+	+/∧⌿¯2-/0,(nl nl⍷x)/+\↑f⍷¨⊂x
+}
+y2020d4p2←{
+	nl←⎕UCS 10
+	ws←' ',nl
+	x←nl,⍨⊃⎕NGET ⍵
+	⍝ assumption: can look ahead without going oob
+	p←⍸nl nl⍷x
+	f←(≢p)7⍴0
+
+	i←⍸'byr'⍷x
+	n←x[i∘.+⍨4+⍳4]-⍥⎕UCS'0'
+	(n i)/⍨←⊂x[i+8]∊ws
+	(n i)/⍨←⊂∧⌿(0∘≤∧≤∘9)n
+	i/⍨←(1920∘≤∧≤∘2002)10 10 10 10⊥n
+	f[1+p⍸i;0]←1
+
+	i←⍸'iyr'⍷x
+	n←x[i∘.+⍨4+⍳4]-⍥⎕UCS'0'
+	(n i)/⍨←⊂x[i+8]∊ws
+	(n i)/⍨←⊂∧⌿(0∘≤∧≤∘9)n
+	i/⍨←(2010∘≤∧≤∘2020)10 10 10 10⊥n
+	f[1+p⍸i;1]←1
+
+	i←⍸'eyr'⍷x
+	n←x[i∘.+⍨4+⍳4]-⍥⎕UCS'0'
+	(n i)/⍨←⊂x[i+8]∊ws
+	(n i)/⍨←⊂∧⌿(0∘≤∧≤∘9)n
+	i/⍨←(2020∘≤∧≤∘2030)10 10 10 10⊥n
+	f[1+p⍸i;2]←1
+
+	i←⍸'hgt'⍷x
+	y←x[i∘.+⍨4+⍳5]
+	cm←⍸(y[3;]='c')∧(y[4;]='m')
+	in←⍸(y[2;]='i')∧(y[3;]='n')
+	cm/⍨←x[i[cm]+9]∊ws
+	in/⍨←x[i[in]+8]∊ws
+	ncm←y[0 1 2;cm]-⍥⎕UCS'0'
+	nin←y[0 1;  in]-⍥⎕UCS'0'
+	(ncm cm)/⍨←⊂∧⌿(0∘≤∧≤∘9)ncm
+	(nin in)/⍨←⊂∧⌿(0∘≤∧≤∘9)nin
+	cm/⍨←(150∘≤∧≤∘193)10 10 10⊥ncm
+	in/⍨← (59∘≤∧≤∘76)    10 10⊥nin
+	f[1+p⍸i[cm,in];3]←1
+
+	i←⍸'hcl'⍷x
+	y←x[i∘.+⍨4+⍳7]
+	(y i)/⍨←⊂x[i+11]∊ws
+	(i y)/⍨←⊂'#'=⊣⌿y
+	i/⍨←∧⌿'0123456789abcdef'∊⍨1↓y
+	f[1+p⍸i;4]←1
+
+	i←⍸'ecl'⍷x
+	y←x[i∘.+4+⍳3]
+	(y i)⌿⍨←⊂x[i+7]∊ws
+	i/⍨←7>['amb' ⋄ 'blu' ⋄ 'brn' ⋄ 'gry' ⋄ 'grn' ⋄ 'hzl' ⋄ 'oth']⍳y
+	f[1+p⍸i;5]←1
+
+	i←⍸'pid'⍷x
+	n←x[i∘.+⍨4+⍳9]-⍥⎕UCS'0'
+	(n i)/⍨←⊂x[i+13]∊ws
+	i/⍨←∧⌿(0∘≤∧≤∘9)n
+	f[1+p⍸i;6]←1
+
+	+/∧/f
+}
+
+y2021d4←{
+	x←⊃⎕NGET ⍵
+	i←x⍳⎕UCS 10
+	(_ n)←','⎕VFI i↑x
+	(_ b)←⎕VFI ' '@{⍵=⎕UCS 10}i↓x
+	b⍴⍨←(b≢⍛÷25),5 5
+	n b
+}
+y2021d4p1←{
+	(n b)←y2021d4 ⍵
+	i←0
+	{
+		m←⍵
+		m∨←b=n[i]
+		w ←⍸∨/∧⌿(⍤1)m
+		w,←⍸∨/∧⌿(⍤2)m
+		×≢w: n[i]×+/+/b[⊃w;;]×~m[⊃w;;]
+		i+←1 ⋄ ∇ m
+	}b×0
+}
+y2021d4p2←{
+	(n b)←y2021d4 ⍵
+	i←0
+	m←b×0
+	{
+		j←⍵
+		1=≢j: m[⊃j;;]{
+			(m b)←⍺ ⍵
+			m∨←b=n[i]
+			∨/(∧/∨∧⌿)m: n[i]×+/+/b×~m
+			i+←1 ⋄ m ∇ b
+		}b[⊃j;;]
+		m[j;;]∨←b[j;;]=n[i]
+		j/⍨←~∨/(∧⌿(⍤1)∨∧⌿(⍤2))m[j;;]
+		i+←1 ⋄ ∇ j
+	}⍳≢b
+}
+
+y2022d4←{
+	(_ n)←('-,',⎕UCS 10)⎕VFI ¯1↓⊃⎕NGET⍵
+	n⍴⍨←(n≢⍛÷4),2 2
+	n
+}
+y2022d4p1←{
+	n←y2022d4 ⍵
+	m ←(n[;0;0]≤n[;1;0])∧(n[;0;1]≥n[;1;1])
+	m∨←(n[;0;0]≥n[;1;0])∧(n[;0;1]≤n[;1;1])
+	+/m
+}
+y2022d4p2←{
+	n←y2022d4 ⍵
+	m ←(n[;0;0]≤n[;1;0])∧(n[;0;1]≥n[;1;0])
+	m∨←(n[;1;0]≤n[;0;0])∧(n[;1;1]≥n[;0;0])
+	+/m
+}
+
+y2023d4←{
+	x←⊃⎕NGET ⍵ 2
+	x↓⍤1⍨←':'⍳⍨⊣⌿x
+	x←,x
+	x⊂⍨←x∊':|'
+	x⍴⍨←(x≢⍛÷2),2
+	x←{⊃⌽⎕VFI 1↓⍵}¨x
+	(+/∊⍨)/x
+}
+y2023d4p1←{
+	n←y2023d4 ⍵
+	+/(××2*¯1+⊢)n
+}
+y2023d4p2←{
+	n←y2023d4 ⍵
+	z←n≢⍛/1
+	+/{
+		c←+/z[(≢n)∘>⍛/⍵+1+⍳n[⍵]]
+		z[⍵]⊣z[⍵]+←c
+	}¨⌽⍳≢n
+}
+
+y2024d4p1←{
+	x←⊃⎕NGET ⍵ 2
+	s←⍴x
+	z←0
+	i←⍸x='X' ⍝ gross nested coords
+	j←( 0  1+⊢)¨i ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='M'
+	j←( 0  1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='A'
+	j←( 0  1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='S' ⋄ z+←≢j
+	j←( 1  1+⊢)¨i ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='M'
+	j←( 1  1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='A'
+	j←( 1  1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='S' ⋄ z+←≢j
+	j←( 1  0+⊢)¨i ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='M'
+	j←( 1  0+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='A'
+	j←( 1  0+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='S' ⋄ z+←≢j
+	j←( 1 ¯1+⊢)¨i ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='M'
+	j←( 1 ¯1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='A'
+	j←( 1 ¯1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='S' ⋄ z+←≢j
+	j←( 0 ¯1+⊢)¨i ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='M'
+	j←( 0 ¯1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='A'
+	j←( 0 ¯1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='S' ⋄ z+←≢j
+	j←(¯1 ¯1+⊢)¨i ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='M'
+	j←(¯1 ¯1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='A'
+	j←(¯1 ¯1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='S' ⋄ z+←≢j
+	j←(¯1  0+⊢)¨i ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='M'
+	j←(¯1  0+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='A'
+	j←(¯1  0+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='S' ⋄ z+←≢j
+	j←(¯1  1+⊢)¨i ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='M'
+	j←(¯1  1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='A'
+	j←(¯1  1+⊢)¨j ⋄ j/⍨←(0 0∘≤∧.∧<∘s)¨j ⋄ j/⍨←x[j]='S' ⋄ z+ ≢j
+}
+y2024d4p2←{
+	x←⊃⎕NGET ⍵ 2
+	i←(0 0∘<∧.∧<∘(¯1+⍴x))¨⍛/⍸x='A' ⍝ more gross nested coords
+	m ←3=+⌿(=∘'M'+2×=∘'S')[x[i+¨⊂¯1 ¯1] ⋄ x[i+¨⊂1  1]]
+	m∧←3=+⌿(=∘'M'+2×=∘'S')[x[i+¨⊂¯1  1] ⋄ x[i+¨⊂1 ¯1]]
+	+/m
+}
+
 ∇ Run
 	⍝ ⎕PROFILE 'start'
 
-	∆←{⍺≢⍵: 'Wrong!' ⎕SIGNAL 100}
+	∆←{
+		⍺≢⍵: 'Wrong!' ⎕SIGNAL 100
+	}
 
 	⍝ 25-day years
 	⍝ 1
@@ -578,6 +831,27 @@ y2024d3p2←{
 	 73201705 ∆ y2023d3p2 'inputs/y2023d3.txt'
 	173731097 ∆ y2024d3p1 'inputs/y2024d3.txt'
 	 93729253 ∆ y2024d3p2 'inputs/y2024d3.txt'
+
+	⍝ 4
+	⍝ TODO: implement MD5 for 2015 day 4 I guess
+	 409147 ∆ y2016d4p1 'inputs/y2016d4.txt'
+	    991 ∆ y2016d4p2 'inputs/y2016d4.txt'
+	    383 ∆ y2017d4p1 'inputs/y2017d4.txt'
+	    265 ∆ y2017d4p2 'inputs/y2017d4.txt'
+	  77941 ∆ y2018d4p1 'inputs/y2018d4.txt'
+	  35289 ∆ y2018d4p2 'inputs/y2018d4.txt'
+	   2150 ∆ y2019d4p1 124075 580769
+	   1462 ∆ y2019d4p2 124075 580769
+	    206 ∆ y2020d4p1 'inputs/y2020d4.txt'
+	    123 ∆ y2020d4p2 'inputs/y2020d4.txt'
+	  72770 ∆ y2021d4p1 'inputs/y2021d4.txt'
+	  13912 ∆ y2021d4p2 'inputs/y2021d4.txt'
+	    567 ∆ y2022d4p1 'inputs/y2022d4.txt'
+	    907 ∆ y2022d4p2 'inputs/y2022d4.txt'
+	  21088 ∆ y2023d4p1 'inputs/y2023d4.txt'
+	6874754 ∆ y2023d4p2 'inputs/y2023d4.txt'
+	   2532 ∆ y2024d4p1 'inputs/y2024d4.txt'
+	   1941 ∆ y2024d4p2 'inputs/y2024d4.txt'
 
 	⍝ 12-day years
 	⍝ 1
